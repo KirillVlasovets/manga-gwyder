@@ -1,0 +1,95 @@
+body {
+    background-color: #FFFFFF;
+    color: #333333;
+    font-family: 'Arial', sans-serif;
+}
+
+.header {
+    background-color: #6A0DAD;
+    color: #FFFFFF;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    max-height: 50px;
+}
+
+.site-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.header a {
+    color: #FFFFFF;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.main-content {
+    padding: 20px;
+}
+
+.slider {
+    margin-bottom: 40px;
+}
+
+.slide-image {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.popular-section, .new-releases-section, .recommended-section {
+    margin-bottom: 40px;
+}
+
+.popular-section .manga-image, .new-releases-section .release-image, .recommended-section .manga-image {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.footer {
+    background-color: #6A0DAD;
+    color: #FFFFFF;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer a {
+    color: #FFFFFF;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.genres-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.genre-link {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #6A0DAD;
+    color: #FFFFFF;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.genre-link:hover {
+    background-color: #8B5FBF;
+}
