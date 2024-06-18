@@ -1,13 +1,21 @@
 package com.gorstreller.mangagwyder.views.base;
 
+import com.gorstreller.mangagwyder.service.s3.S3Service;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseLayout extends VerticalLayout {
+
+    @Autowired
+    protected S3Service s3Service;
 
     public BaseLayout() {
         // Верхний колонтитул
@@ -26,21 +34,23 @@ public class BaseLayout extends VerticalLayout {
         header.addClassName("header");
 
         // Логотип и название сайта
-        Image logo = new Image("", "МангаГвайдер");
+        var logo = new Image("/frontend/images/logo.png", "Manga Logo");
         logo.addClassName("logo");
-        NativeLabel siteName = new NativeLabel("МангаГвайдер");
+        var anchorLogo = new Anchor("", logo);
+        var siteName = new NativeLabel("Манга-Читалка");
         siteName.addClassName("site-name");
+        var anchorSiteName = new Anchor("", siteName);
 
         // Навигационное меню
         Anchor homeLink = new Anchor("", "Главная");
         Anchor genresLink = new Anchor("genres", "Жанры");
-        Anchor newReleasesLink = new Anchor("", "Новинки");
+        Anchor newReleasesLink = new Anchor("new-titles", "Новинки");
         Anchor topLink = new Anchor("", "Топ");
         Anchor recommendedLink = new Anchor("", "Рекомендуемое");
         Anchor searchLink = new Anchor("", "Поиск");
         Anchor loginLink = new Anchor("", "Вход/Регистрация");
 
-        header.add(logo, siteName, homeLink, genresLink, newReleasesLink, topLink, recommendedLink, searchLink, loginLink);
+        header.add(anchorLogo, anchorSiteName, homeLink, genresLink, newReleasesLink, topLink, recommendedLink, searchLink, loginLink);
         return header;
     }
 
@@ -61,5 +71,24 @@ public class BaseLayout extends VerticalLayout {
         footer.add(socialMediaLinks);
 
         return footer;
+    }
+
+    protected String getBaseUrl() {
+        var request = VaadinService.getCurrentRequest();
+        if (request instanceof VaadinServletRequest) {
+            HttpServletRequest httpServletRequest = ((VaadinServletRequest) request).getHttpServletRequest();
+            String scheme = httpServletRequest.getScheme();
+            String serverName = httpServletRequest.getServerName();
+            int serverPort = httpServletRequest.getServerPort();
+            String contextPath = httpServletRequest.getContextPath();
+
+            String baseUrl = scheme + "://" + serverName;
+            if (serverPort != 80 && serverPort != 443) {
+                baseUrl += ":" + serverPort;
+            }
+            baseUrl += contextPath;
+            return baseUrl;
+        }
+        return null;
     }
 }

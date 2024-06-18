@@ -29,22 +29,28 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    compileOnly("org.projectlombok:lombok")
+    implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
-    runtimeOnly("org.postgresql:postgresql")
-    annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("org.postgresql:postgresql:42.7.3")
-    implementation("org.flywaydb:flyway-database-postgresql:10.12.0")
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+    runtimeOnly("org.postgresql:postgresql:42.7.3")
+    implementation("org.flywaydb:flyway-core:10.13.0")
+    implementation("org.flywaydb:flyway-database-postgresql:10.13.0")
     implementation("com.vaadin:vaadin-spring-boot-starter:24.3.12")
     implementation("com.vaadin:vaadin-bom:24.3.12")
+    implementation ("javax.persistence:javax.persistence-api:2.2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
+
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.729")
 }
 
 buildscript {
     dependencies {
         classpath("org.postgresql:postgresql:42.7.3")
-        classpath("org.flywaydb:flyway-database-postgresql:10.12.0")
+        classpath("org.flywaydb:flyway-database-postgresql:10.13.0")
     }
 }
 

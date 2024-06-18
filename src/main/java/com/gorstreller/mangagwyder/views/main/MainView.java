@@ -1,20 +1,32 @@
 package com.gorstreller.mangagwyder.views.main;
 
+import com.gorstreller.mangagwyder.service.MangaService;
+import com.gorstreller.mangagwyder.utils.PropertiesUtils;
 import com.gorstreller.mangagwyder.views.base.BaseLayout;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 @Route(value = "")
 @RouteAlias(value = "")
 @CssImport("./styles/shared-styles.css")
 public class MainView extends BaseLayout {
 
-    public MainView() {
+    private final MangaService mangaService;
+    private final String s3Prefix = "/api/v1";
+
+    @Autowired
+    public MainView(MangaService mangaService) {
         super();
+        this.mangaService = mangaService;
 
         // Основное содержание
         VerticalLayout mainContent = createMainContent();
@@ -67,9 +79,15 @@ public class MainView extends BaseLayout {
 
         // Пример популярных манг
         HorizontalLayout popularManga = new HorizontalLayout();
+        String imageUrl = getBaseUrl() + s3Prefix;
         for (int i = 1; i <= 4; i++) {
-            Image mangaImage = new Image("images/popular" + i + ".jpg", "Популярная манга " + i);
+            var mangaTitle = mangaService.findOne((long) i).getTitle();
+            Image mangaImage = new Image(imageUrl + String.format("/view?path=%s/%s",
+                    mangaTitle,
+                    String.format("%s_Logo.jpg", mangaTitle.replace(" ", "_"))), mangaTitle);
             mangaImage.addClassName("manga-image");
+            mangaImage.setHeight(200, Unit.PIXELS);
+            mangaImage.setWidth(150, Unit.PIXELS);
             popularManga.add(mangaImage);
         }
         popularSection.add(popularManga);
