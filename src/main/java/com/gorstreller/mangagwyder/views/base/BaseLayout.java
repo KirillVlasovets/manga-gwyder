@@ -7,15 +7,17 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class BaseLayout extends VerticalLayout {
+public class BaseLayout extends VerticalLayout implements RouterLayout {
 
     @Autowired
     protected S3Service s3Service;
+    protected final String s3Prefix = "/api/v1";
 
     public BaseLayout() {
         // Верхний колонтитул

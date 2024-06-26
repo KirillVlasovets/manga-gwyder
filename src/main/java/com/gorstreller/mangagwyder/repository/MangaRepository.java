@@ -14,4 +14,6 @@ public interface MangaRepository extends JpaRepository<Manga, Long>, PagingAndSo
 
     @Override
     Page<Manga> findAll(Pageable pageable);
+
+    Manga findMangaByTitleIgnoreCase(String title);
 }

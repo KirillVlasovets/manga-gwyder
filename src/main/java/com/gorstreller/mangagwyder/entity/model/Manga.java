@@ -23,6 +23,9 @@ public class Manga implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @OneToMany(mappedBy="manga")
+    private Set<Chapter> chapters;
+
     @ManyToMany
     @JoinTable(
             name = "manga_authors",

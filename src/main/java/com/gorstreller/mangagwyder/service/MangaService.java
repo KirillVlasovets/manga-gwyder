@@ -21,7 +21,11 @@ public class MangaService {
         return mangaRepository.findAll(pageable);
     }
 
-    public Manga findOne(Long id) {
+    public Manga getMangaById(Long id) {
         return mangaRepository.findMangaById(id);
+    }
+
+    public Manga getMangaByTitle(String title) {
+        return mangaRepository.findMangaByTitleIgnoreCase(title);
     }
 }
