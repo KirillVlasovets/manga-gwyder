@@ -1,5 +1,6 @@
 package com.gorstreller.mangagwyder.views.manga;
 
+import com.gorstreller.mangagwyder.constants.UserRoles;
 import com.gorstreller.mangagwyder.entity.model.Chapter;
 import com.gorstreller.mangagwyder.entity.model.Manga;
 import com.gorstreller.mangagwyder.entity.model.Page;
@@ -12,12 +13,15 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
 
 @Route(value = "reader/:title/:chapterNumber")
+@RolesAllowed({UserRoles.USER, UserRoles.ADMIN})
 public class ReaderView extends BaseLayout implements BeforeEnterObserver {
 
     @Autowired
@@ -39,11 +43,12 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
         mangaPageImage.setWidth("100%");
         mangaPageImage.addClickListener(e -> goToNextPage());
 
-        add(pageSelectionLayout, mangaPageImage, prevChapterButton, nextChapterButton);
+        var chapterSelectionLayout = new HorizontalLayout();
+        chapterSelectionLayout.add(prevChapterButton, nextChapterButton);
+        add(pageSelectionLayout, mangaPageImage, chapterSelectionLayout);
         updateChapterNavigationButtons();
 
         // Keyboard navigation
-        getElement().addEventListener("keydown", e -> goToNextPage()).setFilter("event.key == 'ArrowRight'");
         getElement().addEventListener("keydown", e -> goToPreviousPage()).setFilter("event.key == 'ArrowLeft'");
     }
 

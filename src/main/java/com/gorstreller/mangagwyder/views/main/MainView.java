@@ -1,6 +1,8 @@
 package com.gorstreller.mangagwyder.views.main;
 
+import com.gorstreller.mangagwyder.constants.UserRoles;
 import com.gorstreller.mangagwyder.service.MangaService;
+import com.gorstreller.mangagwyder.utils.UrlUtils;
 import com.gorstreller.mangagwyder.views.base.BaseLayout;
 import com.gorstreller.mangagwyder.views.manga.TitleView;
 import com.vaadin.flow.component.UI;
@@ -14,19 +16,28 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.RolesAllowed;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static com.gorstreller.mangagwyder.constants.ViewsConstants.LOGO_SAMPLE;
+import static com.gorstreller.mangagwyder.constants.ViewsConstants.VIEWS_PATH;
 
 @Route(value = "")
 @RouteAlias(value = "")
+@RolesAllowed({UserRoles.USER, UserRoles.ADMIN})
 @CssImport("./styles/shared-styles.css")
 public class MainView extends BaseLayout {
 
     private final MangaService mangaService;
+    private final UrlUtils urlUtils;
 
     @Autowired
-    public MainView(MangaService mangaService) {
+    public MainView(MangaService mangaService, UrlUtils urlUtils) {
         super();
         this.mangaService = mangaService;
+        this.urlUtils = urlUtils;
 
         // Основное содержание
         VerticalLayout mainContent = createMainContent();
@@ -79,16 +90,12 @@ public class MainView extends BaseLayout {
 
         // Пример популярных манг
         HorizontalLayout popularManga = new HorizontalLayout();
-        String imageUrl = getBaseUrl() + s3Prefix;
         for (int i = 1; i <= 5; i++) {
             var mangaTitle = mangaService.getMangaById((long) i).getTitle();
-            Image mangaImage = new Image(imageUrl + String.format("/view?path=%s/%s",
-                    mangaTitle,
-                    String.format("%s_Logo.jpg", mangaTitle.replace(" ", "_"))), mangaTitle);
+            Image mangaImage = new Image(urlUtils.createLogoPath(getBaseUrl(), mangaTitle), mangaTitle);
+
             mangaImage.addClassName("manga-image");
-            mangaImage.addClickListener(event -> {
-                UI.getCurrent().navigate(TitleView.class, new RouteParameters("title", mangaTitle));
-            });
+            mangaImage.addClickListener(event -> UI.getCurrent().navigate(TitleView.class, new RouteParameters("title", mangaTitle)));
             mangaImage.setHeight(200, Unit.PIXELS);
             mangaImage.setWidth(150, Unit.PIXELS);
             popularManga.add(mangaImage);

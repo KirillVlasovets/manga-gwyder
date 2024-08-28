@@ -1,27 +1,33 @@
 package com.gorstreller.mangagwyder.views.manga;
 
+import com.gorstreller.mangagwyder.constants.UserRoles;
 import com.gorstreller.mangagwyder.entity.model.Chapter;
 import com.gorstreller.mangagwyder.entity.model.Manga;
 import com.gorstreller.mangagwyder.service.ChaptersService;
 import com.gorstreller.mangagwyder.service.MangaService;
+import com.gorstreller.mangagwyder.utils.UrlUtils;
 import com.gorstreller.mangagwyder.views.base.BaseLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
 
 @Route(value = "manga/:title")
+@RolesAllowed({UserRoles.USER, UserRoles.ADMIN})
 public class TitleView extends BaseLayout implements BeforeEnterObserver {
 
     @Autowired
     private MangaService mangaService;
     @Autowired
     private ChaptersService chaptersService;
+    @Autowired
+    private UrlUtils urlUtils;
 
     private final NativeLabel titleLabel = new NativeLabel();
     private final NativeLabel descriptionLabel = new NativeLabel();
@@ -46,9 +52,7 @@ public class TitleView extends BaseLayout implements BeforeEnterObserver {
                 return;
             }
 
-            coverImage.setSrc(getBaseUrl() + s3Prefix + String.format("/view?path=%s/%s",
-                    mangaTitle,
-                    String.format("%s_Logo.jpg", mangaTitle.replace(" ", "_"))));
+            coverImage.setSrc(urlUtils.createLogoPath(getBaseUrl(), mangaTitle));
             coverImage.setAlt("Cover Image");
             coverImage.setWidth("300px");
             coverImage.setHeight("450px");

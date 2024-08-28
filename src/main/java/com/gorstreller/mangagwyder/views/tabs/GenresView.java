@@ -6,9 +6,11 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @Route("genres")
 @CssImport("./styles/shared-styles.css")
+@AnonymousAllowed
 public class GenresView extends BaseLayout {
 
     public GenresView() {

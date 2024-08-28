@@ -1,6 +1,6 @@
 plugins {
     java
-    val flywayVersion = "10.12.0"
+    val flywayVersion = "10.13.0"
     id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
     id("org.flywaydb.flyway") version flywayVersion
@@ -30,10 +30,13 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
-
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+//    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.3.1")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql:42.7.3")
@@ -59,7 +62,7 @@ flyway {
     user = "postgres"
     val dbPassword = System.getenv("DB_PASSWORD") ?: ""
     password = dbPassword
-    println("Using DB_PASSWORD: $dbPassword") // для отладки
+    println("Using DB_PASSWORD: $dbPassword")
 }
 
 vaadin {
