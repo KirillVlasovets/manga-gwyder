@@ -81,7 +81,7 @@ public class TitleView extends BaseLayout implements BeforeEnterObserver {
             RouterLink readerLink = new RouterLink("Read First Chapter", ReaderView.class,
                     new RouteParameters(new RouteParam("title", mangaTitle),
                             new RouteParam("chapterNumber", chaptersService.getChaptersByMangaId(manga.getId())
-                            .getFirst().getId().toString())));
+                            .getFirst().getNumber().toString())));
             chapterListLayout.add(readerLink);
         }
     }
