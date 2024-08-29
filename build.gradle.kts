@@ -1,7 +1,7 @@
 plugins {
     java
     val flywayVersion = "10.13.0"
-    id("org.springframework.boot") version "3.2.3"
+    id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.4"
     id("org.flywaydb.flyway") version flywayVersion
     id("com.vaadin") version "24.3.12"
@@ -66,7 +66,7 @@ flyway {
 }
 
 vaadin {
-    productionMode = false
+    productionMode = true
 }
 
 tasks.withType<Test> {
