@@ -36,18 +36,23 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-//    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.3.1")
+
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
     runtimeOnly("org.postgresql:postgresql:42.7.3")
     implementation("org.flywaydb:flyway-core:10.13.0")
     implementation("org.flywaydb:flyway-database-postgresql:10.13.0")
+
     implementation("com.vaadin:vaadin-spring-boot-starter:24.3.12")
     implementation("com.vaadin:vaadin-bom:24.3.12")
+
     implementation ("javax.persistence:javax.persistence-api:2.2")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
 
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.729")
+
+    implementation("redis.clients:jedis:5.1.5")
 }
 
 buildscript {

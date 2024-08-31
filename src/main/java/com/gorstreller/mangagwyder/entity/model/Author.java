@@ -1,14 +1,16 @@
 package com.gorstreller.mangagwyder.entity.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
-@Table(name = "author")
+@Getter
+@Table(name = "authors")
 public class Author implements Serializable {
 
     @Id
@@ -24,3 +26,4 @@ public class Author implements Serializable {
     @JsonIgnore
     private Set<Manga> mangas;
 }
+

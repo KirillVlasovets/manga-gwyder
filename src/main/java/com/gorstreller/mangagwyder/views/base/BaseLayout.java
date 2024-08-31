@@ -124,4 +124,8 @@ public class BaseLayout extends VerticalLayout implements RouterLayout {
 
         return footer;
     }
+
+    protected void changeURLHashForPages(Integer pageNumber) {
+        getUI().ifPresent(ui -> ui.getPage().executeJs(String.format("window.location.hash='%d';", pageNumber)));
+    }
 }
