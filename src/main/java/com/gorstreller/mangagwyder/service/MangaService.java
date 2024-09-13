@@ -1,12 +1,15 @@
 package com.gorstreller.mangagwyder.service;
 
-import com.gorstreller.mangagwyder.entity.model.Manga;
+import com.gorstreller.mangagwyder.dto.model.MangaDto;
+import com.gorstreller.mangagwyder.dto.wrapper.MangaWrapper;
 import com.gorstreller.mangagwyder.repository.MangaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Service
 public class MangaService {
@@ -18,17 +21,21 @@ public class MangaService {
         this.mangaRepository = mangaRepository;
     }
 
-    public Page<Manga> findAllPaginated(Pageable pageable) {
-        return mangaRepository.findAll(pageable);
+    public Page<MangaDto> findAllPaginated(Pageable pageable) {
+        var mangaEntities = mangaRepository.findAll(pageable);
+        return mangaEntities.map(MangaWrapper::toDto);
     }
 
-    @Cacheable(value = "mangaById", key = "#id")
-    public Manga getMangaById(Long id) {
-        return mangaRepository.findMangaById(id);
+    public MangaDto getMangaById(Long id) {
+        return MangaWrapper.toDto(mangaRepository.findMangaById(id));
     }
 
-    @Cacheable(value = "mangaByTitle", key = "#title.toLowerCase()")
-    public Manga getMangaByTitle(String title) {
-        return mangaRepository.findMangaByTitleIgnoreCase(title);
+    public MangaDto getMangaByTitle(String title) {
+        return MangaWrapper.toDto(mangaRepository.findMangaByTitleIgnoreCase(title));
+    }
+
+    public ArrayList<MangaDto> getMangaListByTitleContains(String titlePart) {
+        return mangaRepository.findMangaByTitleContainsIgnoreCase(titlePart)
+                .stream().map(MangaWrapper::toDto).collect(Collectors.toCollection(ArrayList::new));
     }
 }

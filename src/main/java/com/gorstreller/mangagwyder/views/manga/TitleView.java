@@ -1,12 +1,12 @@
 package com.gorstreller.mangagwyder.views.manga;
 
 import com.gorstreller.mangagwyder.constants.UserRoles;
-import com.gorstreller.mangagwyder.entity.model.Chapter;
-import com.gorstreller.mangagwyder.entity.model.Manga;
+import com.gorstreller.mangagwyder.entity.model.ChapterEntity;
 import com.gorstreller.mangagwyder.service.ChaptersService;
 import com.gorstreller.mangagwyder.service.MangaService;
 import com.gorstreller.mangagwyder.utils.UrlUtils;
 import com.gorstreller.mangagwyder.views.base.BaseLayout;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
@@ -22,12 +22,9 @@ import java.util.Optional;
 @RolesAllowed({UserRoles.USER, UserRoles.ADMIN})
 public class TitleView extends BaseLayout implements BeforeEnterObserver {
 
-    @Autowired
-    private MangaService mangaService;
-    @Autowired
-    private ChaptersService chaptersService;
-    @Autowired
-    private UrlUtils urlUtils;
+    private final MangaService mangaService;
+    private final ChaptersService chaptersService;
+    private final UrlUtils urlUtils;
 
     private final NativeLabel titleLabel = new NativeLabel();
     private final NativeLabel descriptionLabel = new NativeLabel();
@@ -35,7 +32,11 @@ public class TitleView extends BaseLayout implements BeforeEnterObserver {
     private final Image coverImage = new Image();
     private String mangaTitle;
 
-    public TitleView() {
+    @Autowired
+    public TitleView(MangaService mangaService, ChaptersService chaptersService, UrlUtils urlUtils) {
+        this.mangaService = mangaService;
+        this.chaptersService = chaptersService;
+        this.urlUtils = urlUtils;
         add(coverImage, titleLabel, descriptionLabel, chapterListLayout);
     }
 
@@ -45,7 +46,7 @@ public class TitleView extends BaseLayout implements BeforeEnterObserver {
 
         if (mangaTitleParam.isPresent()) {
             mangaTitle = mangaTitleParam.get();
-            Manga manga = mangaService.getMangaByTitle(mangaTitle);
+            var manga = mangaService.getMangaByTitle(mangaTitle);
 
             if (manga == null) {
                 add(new NativeLabel("Manga not found"));
@@ -54,8 +55,8 @@ public class TitleView extends BaseLayout implements BeforeEnterObserver {
 
             coverImage.setSrc(urlUtils.createLogoPath(getBaseUrl(), mangaTitle));
             coverImage.setAlt("Cover Image");
-            coverImage.setWidth("300px");
-            coverImage.setHeight("450px");
+            coverImage.setWidth(300, Unit.PIXELS);
+            coverImage.setHeight(450, Unit.PIXELS);
 
             titleLabel.setText(manga.getTitle());
             titleLabel.getStyle().set("font-size", "24px").set("font-weight", "bold");
@@ -63,22 +64,22 @@ public class TitleView extends BaseLayout implements BeforeEnterObserver {
             descriptionLabel.setText(manga.getDescription());
 
             chapterListLayout.removeAll();
-            List<Chapter> chapters = chaptersService.getChaptersByMangaId(manga.getId());
+            var chapters = chaptersService.getChaptersByMangaId(manga.getId());
             for (int i = 0; i < Math.min(10, chapters.size()); i++) {
-                Chapter chapter = chapters.get(i);
-                RouterLink chapterLink = new RouterLink("Chapter " + chapter.getNumber() + ": " + chapter.getTitle(),
+                var chapter = chapters.get(i);
+                var chapterLink = new RouterLink("Chapter " + chapter.getNumber() + ": " + chapter.getTitle(),
                         ReaderView.class, new RouteParameters(new RouteParam("title", mangaTitle),
                         new RouteParam("chapterNumber", chapter.getNumber())));
                 chapterListLayout.add(chapterLink);
             }
 
             if (chapters.size() > 10) {
-                Button showMoreButton = getButton(chapters);
+                var showMoreButton = getButton(chapters);
                 chapterListLayout.add(showMoreButton);
             }
 
-            // Ссылка на читалку первой главы
-            RouterLink readerLink = new RouterLink("Read First Chapter", ReaderView.class,
+            // The first chapter link
+            var readerLink = new RouterLink("Read First Chapter", ReaderView.class,
                     new RouteParameters(new RouteParam("title", mangaTitle),
                             new RouteParam("chapterNumber", chaptersService.getChaptersByMangaId(manga.getId())
                             .getFirst().getNumber().toString())));
@@ -86,13 +87,13 @@ public class TitleView extends BaseLayout implements BeforeEnterObserver {
         }
     }
 
-    private Button getButton(List<Chapter> chapters) {
-        Button showMoreButton = new Button("Show More", e -> {
-            for (int i = 10; i < chapters.size(); i++) {
-                Chapter chapter = chapters.get(i);
-                RouterLink chapterLink = new RouterLink("Chapter " + chapter.getNumber() + ": " + chapter.getTitle(),
+    private Button getButton(List<ChapterEntity> chapterEntities) {
+        Button showMoreButton = new Button("Show More", event -> {
+            for (int i = 10; i < chapterEntities.size(); i++) {
+                ChapterEntity chapterEntity = chapterEntities.get(i);
+                RouterLink chapterLink = new RouterLink("Chapter " + chapterEntity.getNumber() + ": " + chapterEntity.getTitle(),
                         ReaderView.class,  new RouteParameters(new RouteParam("title", mangaTitle),
-                        new RouteParam("chapterNumber", chapter.getNumber())));
+                        new RouteParam("chapterNumber", chapterEntity.getNumber())));
                 chapterListLayout.add(chapterLink);
             }
         });

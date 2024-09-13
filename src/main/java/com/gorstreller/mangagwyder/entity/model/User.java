@@ -1,14 +1,12 @@
 package com.gorstreller.mangagwyder.entity.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 
-import java.io.Serializable;
-
-@Data
+@Getter
 @Entity
 @Table(name = "users")
-public class MyUser implements Serializable {
+public class User {
 
     @Id
     @Column(name = "id")

@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Table(name = "chapters")
-public class Chapter implements Serializable {
+public class ChapterEntity {
 
     @Id
     @Column(name = "id")
@@ -23,5 +23,5 @@ public class Chapter implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manga_id", nullable = false)
-    private Manga manga;
+    private MangaEntity manga;
 }

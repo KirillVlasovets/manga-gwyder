@@ -93,3 +93,8 @@ body {
 .genre-link:hover {
     background-color: #8B5FBF;
 }
+
+.list-element {
+    padding: 20px;
+    border-style: dashed;
+}

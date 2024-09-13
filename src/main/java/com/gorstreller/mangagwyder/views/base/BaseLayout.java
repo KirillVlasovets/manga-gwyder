@@ -1,24 +1,36 @@
 package com.gorstreller.mangagwyder.views.base;
 
-import com.gorstreller.mangagwyder.service.AuthService;
 import com.gorstreller.mangagwyder.service.s3.S3Service;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.login.LoginForm;
+import com.gorstreller.mangagwyder.views.search.SearchResultView;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.RouteParam;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@AnonymousAllowed
 public class BaseLayout extends VerticalLayout implements RouterLayout {
 
     @Autowired
     protected S3Service s3Service;
     protected final String s3Prefix = "/api/v1";
-    private HorizontalLayout header = new HorizontalLayout();
+    private final HorizontalLayout header = new HorizontalLayout();
 
     public BaseLayout() {
         add(header);
@@ -26,48 +38,9 @@ public class BaseLayout extends VerticalLayout implements RouterLayout {
     }
 
     protected void addFooter() {
-        // Нижний колонтитул
+        // Footer
         Div footer = createFooter();
         add(footer);
-    }
-
-    private void updateHeader() {
-        header.removeAll();
-        header.addClassName("header");
-
-        // Логотип и название сайта
-        var logo = new Image("/frontend/images/logo.png", "Manga Logo");
-        logo.addClassName("logo");
-        var anchorLogo = new Anchor("", logo);
-        var siteName = new NativeLabel("Манга-Читалка");
-        siteName.addClassName("site-name");
-        var anchorSiteName = new Anchor("", siteName);
-
-        // Навигационное меню
-        var homeLink = new Anchor("", "Главная");
-        var genresLink = new Anchor("genres", "Жанры");
-        var newReleasesLink = new Anchor("new-titles", "Новинки");
-        var topLink = new Anchor("", "Топ");
-        var recommendedLink = new Anchor("", "Рекомендуемое");
-        var searchLink = new Anchor("", "Поиск");
-
-        var loginDiv = new Div();
-        if (AuthService.isUserLoggedIn()) {
-            var username = AuthService.getCurrentUser();
-            var logoutLink = new Anchor("login", "Выйти");
-            loginDiv.add(new NativeLabel(String.format("Welcome aboard, %s!", username)));
-            loginDiv.add(logoutLink);
-        } else {
-            var loginLink = new Anchor("", "Вход/Регистрация");
-            var loginDialog = createLoginDialog();
-            loginLink.getElement().addEventListener("click", event -> loginDialog.open());
-
-            loginDiv.add(new NativeLabel("Welcome to the Manga Chitalka, Stranger!"));
-            loginDiv.add(loginLink);
-        }
-
-        header.add(anchorLogo, anchorSiteName, homeLink, genresLink, newReleasesLink, topLink, recommendedLink, searchLink, loginDiv);
-        setSpacing(false);
     }
 
     protected String getBaseUrl() {
@@ -89,28 +62,57 @@ public class BaseLayout extends VerticalLayout implements RouterLayout {
         return null;
     }
 
-    private Dialog createLoginDialog() {
-        var loginDialog = new Dialog();
-        loginDialog.setCloseOnOutsideClick(true);
+    private void updateHeader() {
+        header.removeAll();
+        header.addClassName("header");
 
-        var login = new LoginForm();
-        login.setAction("login");
+        // Logo and app name
+        var logo = new Image("/frontend/images/logo.png", "Manga Logo");
+        logo.addClassName("logo");
+        var anchorLogo = new Anchor("", logo);
+        var siteName = new NativeLabel("Manga-Chitalka");
+        siteName.addClassName("site-name");
+        var anchorSiteName = new Anchor("", siteName);
 
-        add(
-                new H1("Manga-Chitalka app"),
-                login
+        // Navigation menu
+        var homeLink = new Anchor("", "Main Page");
+        var genresLink = new Anchor("genres", "Genres");
+        var newReleasesLink = new Anchor("new-titles", "New Titles");
+        var topLink = new Anchor("", "TOP");
+        var recommendedLink = new Anchor("", "Recommendations");
+        var searchTextField = new TextField("Search");
+        var searchButton = new Button(new Icon(VaadinIcon.SEARCH));
+        //TODO: implement global search
+//        var searchLink = new Anchor("", "Поиск");
+
+        // Set search text area and button
+        searchTextField.setClearButtonVisible(true);
+        searchTextField.setValueChangeMode(ValueChangeMode.ON_CHANGE);
+        searchTextField.addKeyDownListener(Key.ENTER, event ->
+                UI.getCurrent().navigate(SearchResultView.class, new RouteParam("search_text", searchTextField.getValue())));
+        searchButton.addClickListener(event ->
+            UI.getCurrent().navigate(SearchResultView.class, new RouteParam("search_text", searchTextField.getValue()))
         );
-        var dialogLayout = new VerticalLayout();
-        dialogLayout.add(login);
-        loginDialog.add(dialogLayout);
-        return loginDialog;
+
+        header.add(anchorLogo,
+                anchorSiteName,
+                homeLink,
+                genresLink,
+                newReleasesLink,
+                topLink,
+                recommendedLink,
+                searchTextField,
+                searchButton
+//                searchLink
+        );
+        setSpacing(false);
     }
 
     private Div createFooter() {
         var footer = new Div();
         footer.addClassName("footer");
 
-        var footerText = new NativeLabel("© 2024 Манга-Читалка. Все права защищены.");
+        var footerText = new NativeLabel("© 2024 Manga-Chitalka. All rights reserved.");
         footer.add(footerText);
 
         // Социальные сети
@@ -123,9 +125,5 @@ public class BaseLayout extends VerticalLayout implements RouterLayout {
         footer.add(socialMediaLinks);
 
         return footer;
-    }
-
-    protected void changeURLHashForPages(Integer pageNumber) {
-        getUI().ifPresent(ui -> ui.getPage().executeJs(String.format("window.location.hash='%d';", pageNumber)));
     }
 }

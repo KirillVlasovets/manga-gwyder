@@ -1,6 +1,6 @@
 package com.gorstreller.mangagwyder.views.main;
 
-import com.gorstreller.mangagwyder.constants.UserRoles;
+import com.gorstreller.mangagwyder.dto.model.MangaDto;
 import com.gorstreller.mangagwyder.service.MangaService;
 import com.gorstreller.mangagwyder.utils.UrlUtils;
 import com.gorstreller.mangagwyder.views.base.BaseLayout;
@@ -17,16 +17,11 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import jakarta.annotation.security.RolesAllowed;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static com.gorstreller.mangagwyder.constants.ViewsConstants.LOGO_SAMPLE;
-import static com.gorstreller.mangagwyder.constants.ViewsConstants.VIEWS_PATH;
 
 @Route(value = "")
 @RouteAlias(value = "")
-@RolesAllowed({UserRoles.USER, UserRoles.ADMIN})
+@AnonymousAllowed
 @CssImport("./styles/shared-styles.css")
 public class MainView extends BaseLayout {
 
@@ -91,7 +86,7 @@ public class MainView extends BaseLayout {
         // Пример популярных манг
         HorizontalLayout popularManga = new HorizontalLayout();
         for (int i = 1; i <= 5; i++) {
-            var mangaTitle = mangaService.getMangaById((long) i).getTitle();
+            String mangaTitle = mangaService.getMangaById((long) i).getTitle();
             Image mangaImage = new Image(urlUtils.createLogoPath(getBaseUrl(), mangaTitle), mangaTitle);
 
             mangaImage.addClassName("manga-image");

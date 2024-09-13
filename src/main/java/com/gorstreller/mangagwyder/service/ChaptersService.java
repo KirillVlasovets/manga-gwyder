@@ -1,6 +1,6 @@
 package com.gorstreller.mangagwyder.service;
 
-import com.gorstreller.mangagwyder.entity.model.Chapter;
+import com.gorstreller.mangagwyder.entity.model.ChapterEntity;
 import com.gorstreller.mangagwyder.repository.ChaptersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,12 +19,12 @@ public class ChaptersService {
     }
 
     @Cacheable(value = "chaptersByMangaId", key = "#mangaId")
-    public List<Chapter> getChaptersByMangaId(Long mangaId) {
+    public List<ChapterEntity> getChaptersByMangaId(Long mangaId) {
         return chaptersRepository.findByMangaId(mangaId);
     }
 
     @Cacheable(value = "chapterByNumberAndMangaId", key = "{#chapterNumber, #mangaId}")
-    public Chapter getChapterByNumberAndMangaId(Integer chapterNumber, Long mangaId) {
+    public ChapterEntity getChapterByNumberAndMangaId(Integer chapterNumber, Long mangaId) {
         return chaptersRepository.findByNumberAndMangaId(chapterNumber, mangaId);
     }
 }

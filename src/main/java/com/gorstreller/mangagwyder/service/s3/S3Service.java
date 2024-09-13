@@ -5,8 +5,9 @@ import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.gorstreller.mangagwyder.entity.model.Manga;
-import com.gorstreller.mangagwyder.entity.model.Page;
+import com.gorstreller.mangagwyder.dto.model.MangaDto;
+import com.gorstreller.mangagwyder.entity.model.MangaEntity;
+import com.gorstreller.mangagwyder.views.model.Page;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,7 @@ public class S3Service {
     }
 
     public void uploadFile(String keyName, MultipartFile file) throws IOException {
+        log.info("Putting content into bucket {} and key {}", bucketName, keyName);
         var putObjectResult = s3Client.putObject(bucketName, keyName, file.getInputStream(), null);
         log.info(putObjectResult.getMetadata());
     }
@@ -44,8 +46,8 @@ public class S3Service {
         s3Client.deleteObject(bucketName, keyName);
     }
 
-    public List<Page> getAllPagesFromChapter(Manga manga, int chapterNumber) {
-        String mangaTitle = manga.getTitle();
+    public List<Page> getAllPagesFromChapter(MangaDto manga, int chapterNumber) {
+        var mangaTitle = manga.getTitle();
         List<Page> pages = new ArrayList<>();
         ListObjectsV2Request request = new ListObjectsV2Request()
                 .withBucketName(bucketName)

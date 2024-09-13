@@ -1,9 +1,9 @@
 package com.gorstreller.mangagwyder.views.manga;
 
 import com.gorstreller.mangagwyder.constants.UserRoles;
-import com.gorstreller.mangagwyder.entity.model.Chapter;
-import com.gorstreller.mangagwyder.entity.model.Manga;
-import com.gorstreller.mangagwyder.entity.model.Page;
+import com.gorstreller.mangagwyder.dto.model.MangaDto;
+import com.gorstreller.mangagwyder.entity.model.ChapterEntity;
+import com.gorstreller.mangagwyder.views.model.Page;
 import com.gorstreller.mangagwyder.service.ChaptersService;
 import com.gorstreller.mangagwyder.service.MangaService;
 import com.gorstreller.mangagwyder.views.base.BaseLayout;
@@ -13,7 +13,6 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,8 +28,8 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
     @Autowired
     private ChaptersService chaptersService;
 
-    private Chapter currentChapter;
-    private Manga currentManga;
+    private ChapterEntity currentChapterEntity;
+    private MangaDto currentManga;
     private List<Page> pages;
     private int currentPageIndex;
 
@@ -61,7 +60,7 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
             int chapterNumber = Integer.parseInt(chapterNumberParam.get());
             String title = titleParam.get();
             currentManga = mangaService.getMangaByTitle(title);
-            currentChapter = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
+            currentChapterEntity = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
             pages = s3Service.getAllPagesFromChapter(currentManga, chapterNumber);
             currentPageIndex = 0;
 
@@ -111,16 +110,16 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
     }
 
     private void updateChapterNavigationButtons() {
-        prevChapterButton.addClickListener(e -> navigateToChapter(currentChapter.getNumber() - 1));
-        nextChapterButton.addClickListener(e -> navigateToChapter(currentChapter.getNumber() + 1));
+        prevChapterButton.addClickListener(e -> navigateToChapter(currentChapterEntity.getNumber() - 1));
+        nextChapterButton.addClickListener(e -> navigateToChapter(currentChapterEntity.getNumber() + 1));
     }
 
     private void navigateToChapter(int chapterNumber) {
-        Optional<Chapter> optionalChapter = Optional.ofNullable(chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId()));
+        Optional<ChapterEntity> optionalChapter = Optional.ofNullable(chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId()));
         if (optionalChapter.isPresent()) {
             getUI().ifPresent(ui -> ui.navigate(ReaderView.class, new RouteParameters(new RouteParam("title", currentManga.getTitle()),
                     new RouteParam("chapterNumber", chapterNumber))));
-            currentChapter = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
+            currentChapterEntity = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
 
             getElement().executeJs("window.scrollTo(0, 0);");
         }
@@ -132,7 +131,7 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
             updatePage();
             getElement().executeJs("window.scrollTo(0, 0);");
         } else {
-            navigateToChapter(currentChapter.getNumber() + 1);
+            navigateToChapter(currentChapterEntity.getNumber() + 1);
         }
     }
 
@@ -142,7 +141,7 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
             updatePage();
             getElement().executeJs("window.scrollTo(0, 0);");
         } else {
-            navigateToChapter(currentChapter.getNumber() - 1);
+            navigateToChapter(currentChapterEntity.getNumber() - 1);
         }
     }
 }

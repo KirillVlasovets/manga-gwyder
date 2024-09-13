@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
 @Getter
 @Table(name = "authors")
-public class Author implements Serializable {
+public class AuthorEntity {
 
     @Id
     @Column(name = "id")
@@ -24,6 +23,6 @@ public class Author implements Serializable {
 
     @ManyToMany(mappedBy = "authors")
     @JsonIgnore
-    private Set<Manga> mangas;
+    private Set<MangaEntity> mangas;
 }
 

@@ -1,4 +1,4 @@
-package com.gorstreller.mangagwyder.entity.model;
+package com.gorstreller.mangagwyder.views.model;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,5 @@ import lombok.Data;
 public class Page {
 
     private int number;
-//    private int chapterNumber;
-//    private String title;
     private String path;
 }

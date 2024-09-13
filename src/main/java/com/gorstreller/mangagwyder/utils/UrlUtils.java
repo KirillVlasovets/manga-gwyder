@@ -1,5 +1,6 @@
 package com.gorstreller.mangagwyder.utils;
 
+import com.gorstreller.mangagwyder.constants.RegularExpressions;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,6 @@ public class UrlUtils {
     public String createLogoPath(String baseUrl, String mangaTitle) {
         return baseUrl + s3Prefix + String.format(VIEWS_PATH,
                 mangaTitle,
-                String.format(LOGO_SAMPLE, mangaTitle.replace(StringUtils.SPACE, "_")));
+                String.format(LOGO_SAMPLE, mangaTitle.replace(StringUtils.SPACE, RegularExpressions.UNDERSCORE)));
     }
 }
