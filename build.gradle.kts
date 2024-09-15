@@ -50,8 +50,6 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
 
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.729")
-
-    implementation("redis.clients:jedis:5.1.5")
 }
 
 buildscript {
