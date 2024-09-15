@@ -1,12 +1,14 @@
 package com.gorstreller.mangagwyder.views.manga;
 
 import com.gorstreller.mangagwyder.constants.UserRoles;
+import com.gorstreller.mangagwyder.dto.model.ChapterDto;
 import com.gorstreller.mangagwyder.dto.model.MangaDto;
-import com.gorstreller.mangagwyder.entity.model.ChapterEntity;
-import com.gorstreller.mangagwyder.views.model.Page;
 import com.gorstreller.mangagwyder.service.ChaptersService;
 import com.gorstreller.mangagwyder.service.MangaService;
 import com.gorstreller.mangagwyder.views.base.BaseLayout;
+import com.gorstreller.mangagwyder.views.model.Page;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
@@ -16,6 +18,7 @@ import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,10 +31,11 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
     @Autowired
     private ChaptersService chaptersService;
 
-    private ChapterEntity currentChapterEntity;
+    private ChapterDto currentChapter;
     private MangaDto currentManga;
     private List<Page> pages;
     private int currentPageIndex;
+    private final ArrayList<Button> currentChapterPagesButtons = new ArrayList<>();
 
     private final Image mangaPageImage = new Image();
     private final VerticalLayout pageSelectionLayout = new VerticalLayout();
@@ -41,6 +45,10 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
     public ReaderView() {
         mangaPageImage.setWidth("100%");
         mangaPageImage.addClickListener(e -> goToNextPage());
+        mangaPageImage.addClickShortcut(Key.ARROW_RIGHT);
+        UI.getCurrent().addShortcutListener(
+                this::goToPreviousPage,
+                Key.ARROW_LEFT);
 
         var chapterSelectionLayout = new HorizontalLayout();
         chapterSelectionLayout.add(prevChapterButton, nextChapterButton);
@@ -48,7 +56,7 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
         updateChapterNavigationButtons();
 
         // Keyboard navigation
-        getElement().addEventListener("keydown", e -> goToPreviousPage()).setFilter("event.key == 'ArrowLeft'");
+//        getElement().addEventListener("keydown", e -> goToPreviousPage()).setFilter("event.key == 'ArrowLeft'");
     }
 
     @Override
@@ -60,7 +68,7 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
             int chapterNumber = Integer.parseInt(chapterNumberParam.get());
             String title = titleParam.get();
             currentManga = mangaService.getMangaByTitle(title);
-            currentChapterEntity = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
+            currentChapter = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
             pages = s3Service.getAllPagesFromChapter(currentManga, chapterNumber);
             currentPageIndex = 0;
 
@@ -69,7 +77,7 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
                 return;
             }
 
-            updatePageSelection();
+            setPageSelection();
             updatePage();
         }
     }
@@ -82,8 +90,9 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
         }
     }
 
-    private void updatePageSelection() {
+    private void setPageSelection() {
         pageSelectionLayout.removeAll();
+        currentChapterPagesButtons.clear();
         HorizontalLayout pageSelectionLayoutRow = new HorizontalLayout();
         for (int i = 0; i < pages.size(); i++) {
             Button pageButton = new Button(String.valueOf(pages.get(i).getNumber()));
@@ -91,16 +100,17 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
             pageButton.addClickListener(e -> {
                 currentPageIndex = finalI;
                 updatePage();
+                updatePageSelection();
             });
 
-            // Highlight the current page button
             if (i == currentPageIndex) {
-                pageButton.getStyle().set("background-color", "#E6E6FA"); // бледно-фиолетовый цвет
+                pageButton.getStyle().set("background-color", "#E6E6FA");
             }
 
+            currentChapterPagesButtons.add(pageButton);
             pageSelectionLayoutRow.add(pageButton);
 
-            // Перенос на следующую строку через каждые 15 страниц
+            // Wrap to the next line every 15 pages
             if ((i + 1) % 15 == 0) {
                 pageSelectionLayout.add(pageSelectionLayoutRow);
                 pageSelectionLayoutRow = new HorizontalLayout();
@@ -109,17 +119,27 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
         pageSelectionLayout.add(pageSelectionLayoutRow);
     }
 
+    private void updatePageSelection() {
+        for (int i = 0; i < currentChapterPagesButtons.size(); i++) {
+            if (i == currentPageIndex) {
+                currentChapterPagesButtons.get(i).getStyle().set("background-color", "#E6E6FA");
+            } else {
+                currentChapterPagesButtons.get(i).getStyle().set("background-color", "#f4f5f7");
+            }
+        }
+    }
+
     private void updateChapterNavigationButtons() {
-        prevChapterButton.addClickListener(e -> navigateToChapter(currentChapterEntity.getNumber() - 1));
-        nextChapterButton.addClickListener(e -> navigateToChapter(currentChapterEntity.getNumber() + 1));
+        prevChapterButton.addClickListener(e -> navigateToChapter(currentChapter.getNumber() - 1));
+        nextChapterButton.addClickListener(e -> navigateToChapter(currentChapter.getNumber() + 1));
     }
 
     private void navigateToChapter(int chapterNumber) {
-        Optional<ChapterEntity> optionalChapter = Optional.ofNullable(chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId()));
+        Optional<ChapterDto> optionalChapter = Optional.ofNullable(chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId()));
         if (optionalChapter.isPresent()) {
             getUI().ifPresent(ui -> ui.navigate(ReaderView.class, new RouteParameters(new RouteParam("title", currentManga.getTitle()),
                     new RouteParam("chapterNumber", chapterNumber))));
-            currentChapterEntity = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
+            currentChapter = chaptersService.getChapterByNumberAndMangaId(chapterNumber, currentManga.getId());
 
             getElement().executeJs("window.scrollTo(0, 0);");
         }
@@ -128,20 +148,24 @@ public class ReaderView extends BaseLayout implements BeforeEnterObserver {
     private void goToNextPage() {
         if (currentPageIndex < pages.size() - 1) {
             currentPageIndex++;
+            updatePageSelection();
             updatePage();
             getElement().executeJs("window.scrollTo(0, 0);");
         } else {
-            navigateToChapter(currentChapterEntity.getNumber() + 1);
+            navigateToChapter(currentChapter.getNumber() + 1);
+            setPageSelection();
         }
     }
 
     private void goToPreviousPage() {
         if (currentPageIndex > 0) {
             currentPageIndex--;
+            updatePageSelection();
             updatePage();
             getElement().executeJs("window.scrollTo(0, 0);");
         } else {
-            navigateToChapter(currentChapterEntity.getNumber() - 1);
+            navigateToChapter(currentChapter.getNumber() - 1);
+            setPageSelection();
         }
     }
 }
