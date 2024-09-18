@@ -1,6 +1,8 @@
 package com.gorstreller.mangagwyder.views.base;
 
 import com.gorstreller.mangagwyder.service.s3.S3Service;
+import com.gorstreller.mangagwyder.utils.SecurityUtils;
+import com.gorstreller.mangagwyder.views.login.LoginView;
 import com.gorstreller.mangagwyder.views.search.SearchResultView;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -13,13 +15,13 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.RouteParam;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +84,8 @@ public class BaseLayout extends VerticalLayout implements RouterLayout {
         var recommendedLink = new Anchor("", "Recommendations");
         var searchTextField = new TextField("Search");
         var searchButton = new Button(new Icon(VaadinIcon.SEARCH));
+        var greetingText = getGreetingText();
+        var loginLogoutButton = getLoginLogoutButton();
         //TODO: implement global search
 //        var searchLink = new Anchor("", "Поиск");
 
@@ -102,10 +106,42 @@ public class BaseLayout extends VerticalLayout implements RouterLayout {
                 topLink,
                 recommendedLink,
                 searchTextField,
-                searchButton
+                searchButton,
+                greetingText,
+                loginLogoutButton
 //                searchLink
         );
+
         setSpacing(false);
+    }
+
+    private NativeLabel getGreetingText() {
+        var greetingText = new NativeLabel();
+
+        // Setting greeting text and visibility for logout and login buttons
+        if (SecurityUtils.isUserLoggedIn()) {
+            greetingText.setText(String.format("Welcome, %s", SecurityUtils.getNameOfAuthenticatedUser()));
+        } else {
+            greetingText.setText("Welcome, Stranger!");
+        }
+        return greetingText;
+    }
+
+    private Button getLoginLogoutButton() {
+        var loginLogoutButton = new Button();
+        if (SecurityUtils.isUserLoggedIn()) {
+            loginLogoutButton.setText("Logout");
+            loginLogoutButton.setIcon(VaadinIcon.SIGN_OUT.create());
+            loginLogoutButton.addClickListener(click -> {
+                VaadinSession.getCurrent().getSession().invalidate();
+                UI.getCurrent().getPage().reload();
+            });
+        } else {
+            loginLogoutButton.setText("Log In");
+            loginLogoutButton.setIcon(VaadinIcon.SIGN_IN.create());
+            loginLogoutButton.addClickListener(click -> UI.getCurrent().navigate(LoginView.class));
+        }
+        return loginLogoutButton;
     }
 
     private Div createFooter() {
